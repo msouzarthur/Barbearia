@@ -2,6 +2,7 @@ import java.util.ArrayList;
 import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class Barbearia extends Thread {
 
@@ -9,6 +10,9 @@ public class Barbearia extends Thread {
     private Semaphore sFila;
     private Semaphore sPentes;
     private Semaphore sTesouras;
+    private Semaphore sContador;
+    private int nCortes;
+    private int nDesistentes;
     private final ArrayList<Barbeiro> barbeiros;
     private final ArrayList<Thread> threads = new ArrayList<>();
     private Queue fila;
@@ -22,7 +26,7 @@ public class Barbearia extends Thread {
         this.sTesouras = new Semaphore(nBarbeiros/2);
         this.fila = new PriorityQueue(nFila);
         this.nFila = nFila;
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < nBarbeiros; i++) {
             barbeiros.add(new Barbeiro(i, sPentes, sTesouras, this));
         }
     }
@@ -31,8 +35,9 @@ public class Barbearia extends Thread {
     public void run() {
         int count = 0;
         while (count < 20) {
+            //Sorteia o tempo entre clientes
             try {
-                Thread.sleep(200l);
+                Thread.sleep(ThreadLocalRandom.current().nextInt(0, 500));
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
@@ -48,25 +53,24 @@ public class Barbearia extends Thread {
                 System.out.println(ex);
             }
         }
+        System.out.println("<!> cortes realizados "+ this.getnCortes());
+        System.out.println("<!> clientes desistentes "+ this.getnDesistentes());
     }
-
-    public ArrayList<Barbeiro> getBarbeiros() {
-        return barbeiros;
+    public Barbeiro getBarbeiroLivre(){
+        for(Barbeiro b : barbeiros){
+            if(b.getCliente()==null){
+                return b;
+            }
+        }
+        return null;
     }
-
-    public Semaphore getsBarbeiros() {
-        return sBarbeiros;
-    }
-
-    public Semaphore getsFila() {
-        return sFila;
-    }
-
-    public Queue getFila() {
-        return fila;
-    }
-
-    public int getFilaSize() {
-        return nFila;
-    }
+    public ArrayList<Barbeiro> getBarbeiros() {return barbeiros;}
+    public Semaphore getsBarbeiros() {return sBarbeiros;}
+    public Semaphore getsFila() {return sFila;}
+    public Semaphore getsContador(){return sContador;}
+    public Queue getFila() {return fila;}
+    public int getnCortes() {return nCortes;}
+    public int getnDesistentes() {return nDesistentes;}
+    public void corte(){this.nCortes+=1;}
+    public void desistente(){this.nDesistentes+=1;}
 }

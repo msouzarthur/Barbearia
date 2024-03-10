@@ -12,29 +12,23 @@ public class Barbeiro extends Thread {
         this.sPentes = sPentes;
         this.sTesouras = sTesouras;
         this.barbearia = barbearia;
+        this.cliente = null;
     }
-
-    public void setCliente(Cliente cliente) {
-        this.cliente = cliente;
-    }
-
-    public long getTempoCorte(){
-        return cliente.getTempoCorte();
-    }
-
+    public long getId(){return this.id;}
+    public void setCliente(Cliente cliente) {this.cliente = cliente;}
     public Cliente getCliente() {
         return cliente;
     }
-
     public void run(){
         Semaphore sFila = this.barbearia.getsFila();
+        System.out.println("> barbeiro "+this.id+" acordou");
 
         if (this.cliente == null){
             System.out.println("> barbeiro " + this.id + " dormiu");
         }
         else {
             System.out.println("> barbeiro "+this.id+" esta atras de tesoura e pente");
-            while(true & this.cliente != null) {
+            while(this.cliente != null) {
                 try {
                     this.sPentes.acquire();
                     this.sTesouras.acquire();
@@ -45,6 +39,7 @@ public class Barbeiro extends Thread {
                     this.cliente = null;
                     this.sPentes.release();
                     this.sTesouras.release();
+                    barbearia.corte();
                     if (barbearia.getFila().size() > 0) {
                         this.cliente = (Cliente) barbearia.getFila().poll();
                         sFila.release();
@@ -54,6 +49,7 @@ public class Barbeiro extends Thread {
                     throw new RuntimeException(e);
                 }
             }
+            System.out.println("> barbeiro "+this.id+" foi dormir");
         }
     }
 }

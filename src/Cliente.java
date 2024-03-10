@@ -31,39 +31,42 @@ public class Cliente extends Thread implements Comparable<Cliente>{
         System.out.println("> cliente " + id + " entrou <"+this.tempoCorte+"s>");
         Semaphore sBarbeiros = this.barbearia.getsBarbeiros();
         Semaphore sFila = this.barbearia.getsFila();
+        Semaphore sContador = this.barbearia.getsContador();
         Barbeiro barbeiro = null;
-        ArrayList<Barbeiro> barbeiros = this.barbearia.getBarbeiros();
         Queue fila = this.barbearia.getFila();
 
         try{
-            if(sBarbeiros.availablePermits() > 0 & sFila.availablePermits() > 0) {
+            if(sBarbeiros.availablePermits() > 0) {
                 sBarbeiros.acquire();
                 synchronized (this) {
-                    for (Barbeiro barbeiro1 : barbeiros) {
-                        if (barbeiro1.getCliente() == null) {
-                            barbeiro = barbeiro1;
-                            break;
-                        }
-                    }
+                    barbeiro = barbearia.getBarbeiroLivre();
                     if(barbeiro != null) {
+                        Thread threadX = new Thread(barbeiro);
                         barbeiro.setCliente(this);
-                        barbeiro.start();
-                    }
-                    else {
-                        if(fila.offer(this)){
-                            sFila.acquire();
-                            System.out.println("> cliente " + this.getId() + " se sentou");
-                            this.interrupt();
-                        } else {
-                            System.out.println("> cliente " + this.getId() + " foi embora");
-                            this.interrupt();
-                        }
+                        threadX.start();
+                        threadX.join();
                     }
                 }
                 sBarbeiros.release();
             } else {
-                System.out.println("> cliente " + this.getId() + " esta indo embora");
+                if (sFila.availablePermits() > 0){
+//                    fila.offer(this));
+                    fila.add(this);
+                    sFila.acquire();
+
+                    System.out.println("> cliente " + this.getId() + " se sentou");
+                    this.interrupt();
+                } else {
+                    System.out.println("> cliente " + this.getId() + " foi embora");
+                    synchronized (this) {
+                        barbearia.desistente();
+                    }
+                    this.interrupt();
+                }
             }
+                //conta desistente
+//                System.out.println("> cliente " + this.getId() + " esta indo embora");
+//            }
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
