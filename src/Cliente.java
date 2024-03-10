@@ -1,5 +1,3 @@
-import java.util.ArrayList;
-import java.util.Optional;
 import java.util.Queue;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.ThreadLocalRandom;
@@ -31,7 +29,6 @@ public class Cliente extends Thread implements Comparable<Cliente>{
         System.out.println("> cliente " + id + " entrou <"+this.tempoCorte+"s>");
         Semaphore sBarbeiros = this.barbearia.getsBarbeiros();
         Semaphore sFila = this.barbearia.getsFila();
-        Semaphore sContador = this.barbearia.getsContador();
         Barbeiro barbeiro = null;
         Queue fila = this.barbearia.getFila();
 
@@ -50,10 +47,8 @@ public class Cliente extends Thread implements Comparable<Cliente>{
                 sBarbeiros.release();
             } else {
                 if (sFila.availablePermits() > 0){
-//                    fila.offer(this));
                     fila.add(this);
                     sFila.acquire();
-
                     System.out.println("> cliente " + this.getId() + " se sentou");
                     this.interrupt();
                 } else {
@@ -64,9 +59,6 @@ public class Cliente extends Thread implements Comparable<Cliente>{
                     this.interrupt();
                 }
             }
-                //conta desistente
-//                System.out.println("> cliente " + this.getId() + " esta indo embora");
-//            }
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }

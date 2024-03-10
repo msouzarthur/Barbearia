@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 import java.util.PriorityQueue;
 import java.util.Queue;
+import java.util.Random;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -10,7 +11,6 @@ public class Barbearia extends Thread {
     private Semaphore sFila;
     private Semaphore sPentes;
     private Semaphore sTesouras;
-    private Semaphore sContador;
     private int nCortes;
     private int nDesistentes;
     private final ArrayList<Barbeiro> barbeiros;
@@ -33,8 +33,12 @@ public class Barbearia extends Thread {
 
     @Override
     public void run() {
+        Random random = new Random();
         int count = 0;
-        while (count < 20) {
+        int tempo = random.nextInt(5000)+1000;
+        long inicio = System.currentTimeMillis();
+        long rodando = 0;
+        while (rodando < tempo) {
             //Sorteia o tempo entre clientes
             try {
                 Thread.sleep(ThreadLocalRandom.current().nextInt(0, 500));
@@ -44,7 +48,8 @@ public class Barbearia extends Thread {
             Cliente cliente = new Cliente(count, this);
             threads.add(cliente);
             cliente.start();
-            count++;
+            rodando = System.currentTimeMillis() - inicio;
+            count+=1;
         }
         for (Thread thread : threads){
             try {
@@ -67,7 +72,6 @@ public class Barbearia extends Thread {
     public ArrayList<Barbeiro> getBarbeiros() {return barbeiros;}
     public Semaphore getsBarbeiros() {return sBarbeiros;}
     public Semaphore getsFila() {return sFila;}
-    public Semaphore getsContador(){return sContador;}
     public Queue getFila() {return fila;}
     public int getnCortes() {return nCortes;}
     public int getnDesistentes() {return nDesistentes;}
