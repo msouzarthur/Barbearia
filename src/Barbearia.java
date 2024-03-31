@@ -1,12 +1,10 @@
 import java.util.ArrayList;
 import java.util.PriorityQueue;
 import java.util.Queue;
-import java.util.Random;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Barbearia extends Thread {
-
     private Semaphore sBarbeiros;
     private Semaphore sFila;
     private Semaphore sPentes;
@@ -33,22 +31,17 @@ public class Barbearia extends Thread {
 
     @Override
     public void run() {
-        Random random = new Random();
         int count = 0;
-        int tempo = random.nextInt(5000)+1000;
-        long inicio = System.currentTimeMillis();
-        long rodando = 0;
-        while (rodando < tempo) {
+        while (count < 15) {
             //Sorteia o tempo entre clientes
             try {
-                Thread.sleep(ThreadLocalRandom.current().nextInt(0, 500));
+                Thread.sleep(ThreadLocalRandom.current().nextInt(0, 2500));
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
             Cliente cliente = new Cliente(count, this);
             threads.add(cliente);
             cliente.start();
-            rodando = System.currentTimeMillis() - inicio;
             count+=1;
         }
         for (Thread thread : threads){

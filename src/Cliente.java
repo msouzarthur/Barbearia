@@ -12,19 +12,15 @@ public class Cliente extends Thread implements Comparable<Cliente>{
         this.tempoCorte = ThreadLocalRandom.current().nextInt(3, 6);
         this.barbearia = barbearia;
     }
-
     public long getId() {
         return id;
     }
-
     public void setId(int id) {
         this.id = id;
     }
-
     public int getTempoCorte() {
         return tempoCorte;
     }
-
     public void run(){
         System.out.println("> cliente " + id + " entrou <"+this.tempoCorte+"s>");
         Semaphore sBarbeiros = this.barbearia.getsBarbeiros();

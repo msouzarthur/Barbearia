@@ -1,0 +1,17 @@
+intervalo = 1s
+tamanho fila = 10
+quantidade barbeiros = 8
+cortes = 15
+desistentes = 0
+------------------------
+intervalo = 2s
+tamanho fila = 6
+quantidade barbeiros = 2
+cortes = 11
+desistentes = 4
+------------------------
+intervalo = 3s
+tamanho fila = 2
+quantidade barbeiros = 4
+cortes = 10
+desistentes = 5
